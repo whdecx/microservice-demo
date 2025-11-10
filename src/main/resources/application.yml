@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: message-chain-api
+
+server:
+  port: 8080
+
+# External service URLs for inter-service communication
+services:
+  # Toggle between RestClient (true) and direct method calls (false)
+  use-rest-client: ${USE_REST_CLIENT:true}
+
+  service-b:
+    url: ${SERVICE_B_URL:http://localhost:8081}
+  service-c:
+    url: ${SERVICE_C_URL:http://localhost:8082}
+
+  # RestClient configuration
+  rest-client:
+    connect-timeout: 5000  # milliseconds
+    read-timeout: 10000    # milliseconds
+
+# Message templates configuration for each service
+message:
+  service-a:
+    template: "Hello {user}!"
+    service-name: "service-a"
+    description: "Greeting service"
+
+  service-b:
+    template: "{previous_message} Welcome to our system."
+    service-name: "service-b"
+    description: "Welcome message service"
+
+  service-c:
+    template: "{previous_message} Your account is ready!"
+    service-name: "service-c"
+    description: "Confirmation service"
+
+# Logging configuration
+logging:
+  level:
+    org.example.microservice_demo: INFO
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator endpoints for health checks (important for ECS)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true

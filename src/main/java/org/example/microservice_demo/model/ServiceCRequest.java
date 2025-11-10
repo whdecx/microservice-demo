@@ -1,0 +1,19 @@
+package org.example.microservice_demo.model;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Request model for Service C internal API
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ServiceCRequest {
+    @NotBlank(message = "current_message is required")
+    private String currentMessage;
+}
