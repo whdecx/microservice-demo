@@ -1,4 +1,4 @@
-package org.example.microservice_demo.config;
+package org.example.microservicedemo.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestClient;
-
-import java.time.Duration;
 
 /**
  * Configuration for RestClient beans used for inter-service communication

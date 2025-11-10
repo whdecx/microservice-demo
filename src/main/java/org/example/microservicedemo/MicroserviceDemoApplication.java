@@ -1,4 +1,4 @@
-package org.example.microservice_demo;
+package org.example.microservicedemo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

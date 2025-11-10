@@ -1,7 +1,7 @@
-package org.example.microservice_demo.exception;
+package org.example.microservicedemo.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.microservice_demo.model.ErrorResponse;
+import org.example.microservicedemo.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

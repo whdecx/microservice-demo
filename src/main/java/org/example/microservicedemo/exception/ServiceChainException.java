@@ -1,4 +1,4 @@
-package org.example.microservice_demo.exception;
+package org.example.microservicedemo.exception;
 
 import lombok.Getter;
 

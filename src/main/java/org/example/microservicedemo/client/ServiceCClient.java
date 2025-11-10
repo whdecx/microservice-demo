@@ -1,10 +1,10 @@
-package org.example.microservice_demo.client;
+package org.example.microservicedemo.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.microservice_demo.exception.ServiceCommunicationException;
-import org.example.microservice_demo.model.ServiceCRequest;
-import org.example.microservice_demo.model.ServiceCResponse;
+import org.example.microservicedemo.exception.ServiceCommunicationException;
+import org.example.microservicedemo.model.ServiceCRequest;
+import org.example.microservicedemo.model.ServiceCResponse;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;

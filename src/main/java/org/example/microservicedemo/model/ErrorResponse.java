@@ -1,4 +1,4 @@
-package org.example.microservice_demo.model;
+package org.example.microservicedemo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

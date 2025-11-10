@@ -1,11 +1,11 @@
-package org.example.microservice_demo.service;
+package org.example.microservicedemo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.microservice_demo.client.ServiceBClient;
-import org.example.microservice_demo.client.ServiceCClient;
-import org.example.microservice_demo.config.MessageTemplateConfig;
-import org.example.microservice_demo.model.*;
+import org.example.microservicedemo.client.ServiceBClient;
+import org.example.microservicedemo.client.ServiceCClient;
+import org.example.microservicedemo.config.MessageTemplateConfig;
+import org.example.microservicedemo.model.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

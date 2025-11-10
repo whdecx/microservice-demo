@@ -1,4 +1,4 @@
-package org.example.microservice_demo.config;
+package org.example.microservicedemo.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

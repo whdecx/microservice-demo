@@ -1,12 +1,12 @@
-package org.example.microservice_demo.controller;
+package org.example.microservicedemo.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.microservice_demo.model.ServiceCRequest;
-import org.example.microservice_demo.model.ServiceCResponse;
-import org.example.microservice_demo.model.UpdateTemplateRequest;
-import org.example.microservice_demo.model.UpdateTemplateResponse;
-import org.example.microservice_demo.service.MessageService;
+import org.example.microservicedemo.model.ServiceCRequest;
+import org.example.microservicedemo.model.ServiceCResponse;
+import org.example.microservicedemo.model.UpdateTemplateRequest;
+import org.example.microservicedemo.model.UpdateTemplateResponse;
+import org.example.microservicedemo.service.MessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

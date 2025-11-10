@@ -1,4 +1,4 @@
-package org.example.microservice_demo.model;
+package org.example.microservicedemo.model;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

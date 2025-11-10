@@ -1,4 +1,4 @@
-package org.example.microservice_demo.model;
+package org.example.microservicedemo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,13 +8,16 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * Response model for Service B internal API
+ * Response for the client-facing GET /api/message endpoint
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceBResponse {
+public class MessageResponse {
     private String message;
     private List<ChainLink> chain;
+    private Boolean complete;
+    private Integer totalLength;
+    private Long processingTimeMs;
 }
