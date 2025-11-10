@@ -107,41 +107,8 @@ cd microservice-demo
 docker build -t message-chain-api:latest .
 
 # Run the container
-docker run -p 8080:8080 message-chain-api:latest
+docker run -d -p 8080:8080 message-chain-api:latest
 ```
-
-#### Option 2: Build Directly from GitHub
-
-```bash
-# Clone the repository first (for the Dockerfile)
-git clone https://github.com/whdecx/microservice-demo.git
-cd microservice-demo
-
-# Build the Docker image pulling source from GitHub main branch
-docker build --build-arg BUILD_SOURCE=github -t message-chain-api:latest .
-
-# Build from a specific branch
-docker build \
-  --build-arg BUILD_SOURCE=github \
-  --build-arg GIT_BRANCH=develop \
-  -t message-chain-api:develop .
-
-# Build from a different repository fork
-docker build \
-  --build-arg BUILD_SOURCE=github \
-  --build-arg GIT_REPO=https://github.com/yourfork/microservice-demo.git \
-  --build-arg GIT_BRANCH=feature-branch \
-  -t message-chain-api:custom .
-
-# Run the container
-docker run -p 8080:8080 message-chain-api:latest
-```
-
-**Benefits of GitHub build:**
-- Always builds from the latest code in the repository
-- Useful for CI/CD pipelines
-- No need to keep local source files in sync
-- Can build specific branches or forks
 
 ### Run with Docker Compose
 
@@ -496,40 +463,6 @@ docker build -t message-chain-api:v1.0.0 .
 # Push to container registry
 docker tag message-chain-api:v1.0.0 your-registry/message-chain-api:v1.0.0
 docker push your-registry/message-chain-api:v1.0.0
-```
-
-#### Build from GitHub (Recommended for CI/CD)
-
-```bash
-# Build Docker image directly from GitHub main branch
-docker build \
-  --build-arg BUILD_SOURCE=github \
-  -t message-chain-api:v1.0.0 \
-  https://github.com/whdecx/microservice-demo.git#main
-
-# Build from a specific release tag
-docker build \
-  --build-arg BUILD_SOURCE=github \
-  --build-arg GIT_BRANCH=v1.0.0 \
-  -t message-chain-api:v1.0.0 \
-  https://github.com/whdecx/microservice-demo.git#v1.0.0
-
-# Push to container registry
-docker tag message-chain-api:v1.0.0 your-registry/message-chain-api:v1.0.0
-docker push your-registry/message-chain-api:v1.0.0
-```
-
-#### CI/CD Pipeline Example
-
-```yaml
-# Example GitHub Actions workflow
-- name: Build Docker image from GitHub
-  run: |
-    docker build \
-      --build-arg BUILD_SOURCE=github \
-      --build-arg GIT_BRANCH=${{ github.ref_name }} \
-      -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-      .
 ```
 
 ## Design Patterns Used

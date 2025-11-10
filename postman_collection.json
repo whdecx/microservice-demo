@@ -1,0 +1,866 @@
+{
+	"info": {
+		"_postman_id": "microservice-demo-api",
+		"name": "Message Chain API",
+		"description": "A distributed message processing demo using Spring Boot that demonstrates the Chain of Responsibility pattern across three service endpoints. Each service appends its message contribution, and the final result flows back through the chain to the client.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "microservice-demo"
+	},
+	"item": [
+		{
+			"name": "Client-Facing Endpoints",
+			"item": [
+				{
+					"name": "Get Complete Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has correct structure\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('chain');",
+									"    pm.expect(jsonData).to.have.property('complete');",
+									"    pm.expect(jsonData).to.have.property('totalLength');",
+									"    pm.expect(jsonData).to.have.property('processingTimeMs');",
+									"});",
+									"",
+									"pm.test(\"Chain has 3 services\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.chain).to.have.lengthOf(3);",
+									"    pm.expect(jsonData.chain[0].service).to.eql('service-a');",
+									"    pm.expect(jsonData.chain[1].service).to.eql('service-b');",
+									"    pm.expect(jsonData.chain[2].service).to.eql('service-c');",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/message?user=john",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"message"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "john",
+									"description": "Username to personalize the message (optional, max 50 characters)"
+								}
+							]
+						},
+						"description": "Main entry point that initiates the message chain. Returns a complete message from all three services in the chain."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/message?user=john",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"message"
+									],
+									"query": [
+										{
+											"key": "user",
+											"value": "john"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"message\": \"Hello john! Welcome to our system. Your account is ready!\",\n  \"chain\": [\n    {\n      \"service\": \"service-a\",\n      \"contribution\": \"Hello john!\",\n      \"timestamp\": \"2024-11-10T14:30:00.100Z\"\n    },\n    {\n      \"service\": \"service-b\",\n      \"contribution\": \"Welcome to our system.\",\n      \"timestamp\": \"2024-11-10T14:30:00.250Z\"\n    },\n    {\n      \"service\": \"service-c\",\n      \"contribution\": \"Your account is ready!\",\n      \"timestamp\": \"2024-11-10T14:30:00.400Z\"\n    }\n  ],\n  \"complete\": true,\n  \"totalLength\": 58,\n  \"processingTimeMs\": 350\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Message (Default User)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Message contains 'guest'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('guest');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"message"
+							]
+						},
+						"description": "Test with default user (guest)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service A Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains updated template\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('service');",
+									"    pm.expect(jsonData).to.have.property('template');",
+									"    pm.expect(jsonData).to.have.property('updatedAt');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.service).to.eql('service-a');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template\": \"Hey {user}, nice to see you!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-a/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-a",
+								"message"
+							]
+						},
+						"description": "Update the message template for Service A. Use {user} placeholder for username substitution."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"template\": \"Hey {user}, nice to see you!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/service-a/message",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"service-a",
+										"message"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"service\": \"service-a\",\n  \"template\": \"Hey {user}, nice to see you!\",\n  \"updatedAt\": \"2024-11-10T14:35:00Z\",\n  \"message\": \"Message template updated successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Service B Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Service is service-b\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.service).to.eql('service-b');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template\": \"{previous_message} Everything is ready for you.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-b/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-b",
+								"message"
+							]
+						},
+						"description": "Update the message template for Service B. Use {previous_message} placeholder to include the message from Service A."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service C Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Service is service-c\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.service).to.eql('service-c');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template\": \"{previous_message} Let's get started!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-c/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-c",
+								"message"
+							]
+						},
+						"description": "Update the message template for Service C. Use {previous_message} placeholder to include the combined message from Services A and B."
+					},
+					"response": []
+				}
+			],
+			"description": "Public-facing API endpoints that clients can call directly."
+		},
+		{
+			"name": "Internal Endpoints - Service B",
+			"item": [
+				{
+					"name": "Append Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has message and chain\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('chain');",
+									"});",
+									"",
+									"pm.test(\"Chain has 2 services (B and C)\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.chain).to.have.lengthOf(2);",
+									"    pm.expect(jsonData.chain[0].service).to.eql('service-b');",
+									"    pm.expect(jsonData.chain[1].service).to.eql('service-c');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Internal-Request",
+								"value": "true",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentMessage\": \"Hello john!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/internal/service-b/append",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"internal",
+								"service-b",
+								"append"
+							]
+						},
+						"description": "Internal endpoint called by Service A. Appends Service B's message and calls Service C to complete the chain."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Internal-Request",
+										"value": "true",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"currentMessage\": \"Hello john!\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/internal/service-b/append",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"internal",
+										"service-b",
+										"append"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"message\": \"Hello john! Welcome to our system. Your account is ready!\",\n  \"chain\": [\n    {\n      \"service\": \"service-b\",\n      \"contribution\": \"Welcome to our system.\",\n      \"timestamp\": \"2024-11-10T14:30:00.250Z\"\n    },\n    {\n      \"service\": \"service-c\",\n      \"contribution\": \"Your account is ready!\",\n      \"timestamp\": \"2024-11-10T14:30:00.400Z\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			],
+			"description": "Internal endpoints for Service B, typically called by Service A."
+		},
+		{
+			"name": "Internal Endpoints - Service C",
+			"item": [
+				{
+					"name": "Finalize Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('contribution');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-Internal-Request",
+								"value": "true",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentMessage\": \"Hello john! Welcome to our system.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/internal/service-c/finalize",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"internal",
+								"service-c",
+								"finalize"
+							]
+						},
+						"description": "Internal endpoint called by Service B. Finalizes the message chain by adding Service C's contribution."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "X-Internal-Request",
+										"value": "true",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"currentMessage\": \"Hello john! Welcome to our system.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/internal/service-c/finalize",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"internal",
+										"service-c",
+										"finalize"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"message\": \"Hello john! Welcome to our system. Your account is ready!\",\n  \"contribution\": \"Your account is ready!\",\n  \"timestamp\": \"2024-11-10T14:30:00.400Z\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Internal endpoints for Service C, typically called by Service B."
+		},
+		{
+			"name": "System & Health Endpoints",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Service is UP\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('UP');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Spring Boot Actuator health check endpoint. Returns the health status of the application."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/actuator/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"actuator",
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"UP\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Application Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/info",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"info"
+							]
+						},
+						"description": "Spring Boot Actuator info endpoint. Returns application information."
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/metrics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"metrics"
+							]
+						},
+						"description": "Spring Boot Actuator metrics endpoint. Returns available application metrics."
+					},
+					"response": []
+				}
+			],
+			"description": "Spring Boot Actuator endpoints for health checks, monitoring, and metrics."
+		},
+		{
+			"name": "Error Scenarios",
+			"item": [
+				{
+					"name": "Validation Error - User Too Long",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error response structure\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/message?user=this_username_is_way_too_long_and_exceeds_the_maximum_allowed_length_of_50_characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"message"
+							],
+							"query": [
+								{
+									"key": "user",
+									"value": "this_username_is_way_too_long_and_exceeds_the_maximum_allowed_length_of_50_characters",
+									"description": "Invalid - exceeds 50 character limit"
+								}
+							]
+						},
+						"description": "Test validation error when username exceeds 50 characters"
+					},
+					"response": [
+						{
+							"name": "Validation Error",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/message?user=this_username_is_way_too_long_and_exceeds_fifty_chars",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"message"
+									],
+									"query": [
+										{
+											"key": "user",
+											"value": "this_username_is_way_too_long_and_exceeds_fifty_chars"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"invalid_input\",\n  \"message\": \"Query parameter 'user' must not exceed 50 characters\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Validation Error - Empty Template",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message indicates template required\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include('template');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/service-a/message",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"service-a",
+								"message"
+							]
+						},
+						"description": "Test validation error when template is empty"
+					},
+					"response": [
+						{
+							"name": "Validation Error",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"template\": \"\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/service-a/message",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"service-a",
+										"message"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"invalid_input\",\n  \"message\": \"template is required\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Examples of error scenarios and validation failures"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

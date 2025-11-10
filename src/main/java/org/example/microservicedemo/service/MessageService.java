@@ -28,6 +28,9 @@ public class MessageService {
     @Value("${services.use-rest-client:true}")
     private boolean useRestClient;
 
+    @Value("${services.use-async:true}")
+    private boolean useAsync;
+
     /**
      * Service A: Entry point - generates message and initiates chain
      */
@@ -54,8 +57,18 @@ public class MessageService {
 
         ServiceBResponse serviceBResponse;
         if (useRestClient) {
-            log.info("Calling Service B via RestClient");
-            serviceBResponse = serviceBClient.processMessage(serviceBRequest);
+            if (useAsync) {
+                log.info("Calling Service B via RestClient asynchronously");
+                try {
+                    serviceBResponse = serviceBClient.processMessageAsync(serviceBRequest).join();
+                } catch (Exception e) {
+                    log.error("Async call to Service B failed: {}", e.getMessage(), e);
+                    throw new RuntimeException("Failed to process Service B asynchronously", e);
+                }
+            } else {
+                log.info("Calling Service B via RestClient synchronously");
+                serviceBResponse = serviceBClient.processMessage(serviceBRequest);
+            }
         } else {
             log.info("Calling Service B via direct method call");
             serviceBResponse = processServiceB(serviceBRequest);
@@ -104,8 +117,18 @@ public class MessageService {
 
         ServiceCResponse serviceCResponse;
         if (useRestClient) {
-            log.info("Calling Service C via RestClient");
-            serviceCResponse = serviceCClient.processMessage(serviceCRequest);
+            if (useAsync) {
+                log.info("Calling Service C via RestClient asynchronously");
+                try {
+                    serviceCResponse = serviceCClient.processMessageAsync(serviceCRequest).join();
+                } catch (Exception e) {
+                    log.error("Async call to Service C failed: {}", e.getMessage(), e);
+                    throw new RuntimeException("Failed to process Service C asynchronously", e);
+                }
+            } else {
+                log.info("Calling Service C via RestClient synchronously");
+                serviceCResponse = serviceCClient.processMessage(serviceCRequest);
+            }
         } else {
             log.info("Calling Service C via direct method call");
             serviceCResponse = processServiceC(serviceCRequest);

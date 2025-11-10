@@ -10,10 +10,13 @@ services:
   # Toggle between RestClient (true) and direct method calls (false)
   use-rest-client: ${USE_REST_CLIENT:true}
 
+  # Toggle between async (true) and sync (false) RestClient calls
+  use-async: ${USE_ASYNC:true}
+
   service-b:
-    url: ${SERVICE_B_URL:http://localhost:8081}
+    url: ${SERVICE_B_URL:http://localhost:8080}
   service-c:
-    url: ${SERVICE_C_URL:http://localhost:8082}
+    url: ${SERVICE_C_URL:http://localhost:8080}
 
   # RestClient configuration
   rest-client:
