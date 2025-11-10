@@ -107,7 +107,12 @@ cd microservice-demo
 docker build -t message-chain-api:latest .
 
 # Run the container
-docker run -d -p 8080:8080 message-chain-api:latest
+docker run -d \
+  --name message-chain-api \
+  -p 8080:8080 \
+  -e SERVICE_B_URL=http://localhost:8080 \
+  -e SERVICE_C_URL=http://localhost:8080 \
+  message-chain-api:latest
 ```
 
 ### Run with Docker Compose
