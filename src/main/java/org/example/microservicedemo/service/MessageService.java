@@ -36,10 +36,10 @@ public class MessageService {
     /**
      * Service A: Entry point - generates message and initiates chain
      */
-    public MessageResponse processServiceA(String user, String ipAddress) {
+    public MessageResponse processServiceA(String user) {
         long startTime = System.currentTimeMillis();
 
-        log.info("Service A: Processing request for user={} from IP={}", user, ipAddress);
+        log.info("Service A: Processing request for user={}", user);
 
         // Generate Service A's message
         String template = config.getServiceA().getCurrentTemplate();
@@ -48,9 +48,9 @@ public class MessageService {
         Instant serviceATimestamp = Instant.now();
         ChainLink serviceALink = ChainLink.builder()
                 .service("service-a")
+                .applicationName(appConfig.getApplicationName())
                 .contribution(serviceAMessage)
                 .timestamp(serviceATimestamp)
-                .ipAddress(ipAddress)
                 .build();
 
         // Call Service B (via RestClient or in-process)
@@ -74,7 +74,7 @@ public class MessageService {
             }
         } else {
             log.info("Calling Service B via direct method call");
-            serviceBResponse = processServiceB(serviceBRequest, "localhost");
+            serviceBResponse = processServiceB(serviceBRequest);
         }
 
         // Build complete chain
@@ -99,9 +99,9 @@ public class MessageService {
     /**
      * Service B: Appends message and calls Service C
      */
-    public ServiceBResponse processServiceB(ServiceBRequest request, String ipAddress) {
-        log.info("Service B: Processing request with current message length={} from IP={}",
-                request.getCurrentMessage().length(), ipAddress);
+    public ServiceBResponse processServiceB(ServiceBRequest request) {
+        log.info("Service B: Processing request with current message length={}",
+                request.getCurrentMessage().length());
 
         // Get Service B's template and append message
         String template = config.getServiceB().getCurrentTemplate();
@@ -113,9 +113,9 @@ public class MessageService {
         Instant serviceBTimestamp = Instant.now();
         ChainLink serviceBLink = ChainLink.builder()
                 .service("service-b")
+                .applicationName(appConfig.getApplicationName())
                 .contribution(contribution)
                 .timestamp(serviceBTimestamp)
-                .ipAddress(ipAddress)
                 .build();
 
         // Call Service C (via RestClient or in-process)
@@ -139,7 +139,7 @@ public class MessageService {
             }
         } else {
             log.info("Calling Service C via direct method call");
-            serviceCResponse = processServiceC(serviceCRequest, "localhost");
+            serviceCResponse = processServiceC(serviceCRequest);
         }
 
         // Build chain for Service B's response
@@ -147,9 +147,9 @@ public class MessageService {
         chain.add(serviceBLink);
         chain.add(ChainLink.builder()
                 .service("service-c")
+                .applicationName(serviceCResponse.getApplicationName())
                 .contribution(serviceCResponse.getContribution())
                 .timestamp(serviceCResponse.getTimestamp())
-                .ipAddress(serviceCResponse.getIpAddress())
                 .build());
 
         log.info("Service B: Processed and forwarded to Service C");
@@ -164,9 +164,9 @@ public class MessageService {
     /**
      * Service C: Final service - appends final message and returns
      */
-    public ServiceCResponse processServiceC(ServiceCRequest request, String ipAddress) {
-        log.info("Service C: Processing final request with current message length={} from IP={}",
-                request.getCurrentMessage().length(), ipAddress);
+    public ServiceCResponse processServiceC(ServiceCRequest request) {
+        log.info("Service C: Processing final request with current message length={}",
+                request.getCurrentMessage().length());
 
         // Get Service C's template and append final message
         String template = config.getServiceC().getCurrentTemplate();
@@ -184,7 +184,6 @@ public class MessageService {
                 .message(finalMessage)
                 .contribution(contribution)
                 .timestamp(serviceCTimestamp)
-                .ipAddress(ipAddress)
                 .build();
     }
 

@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment Configuration ###
+# Ignore environment files that may contain sensitive data
+.env
+.env.local
+.env.*.local
+.env.custom
+
+# Keep example files
+!.env.example

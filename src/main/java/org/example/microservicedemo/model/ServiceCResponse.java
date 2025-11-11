@@ -19,5 +19,4 @@ public class ServiceCResponse {
     private String message;
     private String contribution;
     private Instant timestamp;
-    private String ipAddress;
 }

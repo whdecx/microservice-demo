@@ -1,6 +1,5 @@
 package org.example.microservicedemo.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.microservicedemo.model.ServiceCRequest;
@@ -33,13 +32,11 @@ public class ServiceCController {
     @PostMapping("/finalize")
     public ResponseEntity<ServiceCResponse> finalizeMessage(
             @RequestBody @Validated ServiceCRequest request,
-            @RequestHeader(value = "X-Internal-Request", required = false) String internalHeader,
-            HttpServletRequest httpRequest) {
+            @RequestHeader(value = "X-Internal-Request", required = false) String internalHeader) {
 
-        String ipAddress = httpRequest.getRemoteAddr();
-        log.info("Service C: Received internal request for finalization from IP: {}", ipAddress);
+        log.info("Service C: Received internal request for finalization");
 
-        ServiceCResponse response = messageService.processServiceC(request, ipAddress);
+        ServiceCResponse response = messageService.processServiceC(request);
 
         log.info("Service C: Returning final message to Service B");
 

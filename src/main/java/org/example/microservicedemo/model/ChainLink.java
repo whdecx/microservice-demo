@@ -16,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class ChainLink {
     private String service;
+    private String applicationName;
     private String contribution;
     private Instant timestamp;
-    private String ipAddress;
 }

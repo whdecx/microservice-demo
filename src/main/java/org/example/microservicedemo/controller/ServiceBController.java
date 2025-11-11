@@ -1,6 +1,5 @@
 package org.example.microservicedemo.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.microservicedemo.model.ServiceBRequest;
@@ -33,13 +32,11 @@ public class ServiceBController {
     @PostMapping("/append")
     public ResponseEntity<ServiceBResponse> appendMessage(
             @RequestBody @Validated ServiceBRequest request,
-            @RequestHeader(value = "X-Internal-Request", required = false) String internalHeader,
-            HttpServletRequest httpRequest) {
+            @RequestHeader(value = "X-Internal-Request", required = false) String internalHeader) {
 
-        String ipAddress = httpRequest.getRemoteAddr();
-        log.info("Service B: Received internal request from IP: {}", ipAddress);
+        log.info("Service B: Received internal request");
 
-        ServiceBResponse response = messageService.processServiceB(request, ipAddress);
+        ServiceBResponse response = messageService.processServiceB(request);
 
         log.info("Service B: Returning response to Service A");
 

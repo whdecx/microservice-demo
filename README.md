@@ -106,13 +106,53 @@ cd microservice-demo
 # Build the Docker image from local files
 docker build -t message-chain-api:latest .
 
-# Run the container
+# Run the container using environment file (recommended)
+docker run -d \
+  --name message-chain-api \
+  -p 8080:8080 \
+  --env-file .env \
+  message-chain-api:latest
+
+# OR run with individual environment variables
 docker run -d \
   --name message-chain-api \
   -p 8080:8080 \
   -e SERVICE_B_URL=http://localhost:8080 \
   -e SERVICE_C_URL=http://localhost:8080 \
+  -e SERVICES_REST_CLIENT_CONNECT_TIMEOUT=5000 \
+  -e SERVICES_REST_CLIENT_READ_TIMEOUT=10000 \
   message-chain-api:latest
+```
+
+**Environment Configuration:**
+
+The project includes environment configuration files:
+- `.env` - Default configuration for local development
+- `.env.example` - Template with all available options and documentation
+
+To customize configuration:
+```bash
+# Option 1: Edit the .env file directly
+nano .env
+
+# Option 2: Copy and customize the example
+cp .env.example .env.custom
+# Edit .env.custom with your values
+docker run -d --name message-chain-api -p 8080:8080 --env-file .env.custom message-chain-api:latest
+```
+
+Available environment variables:
+- `APP_NAME` - Application name (default: "Microservice Chain")
+- `USE_REST_CLIENT` - Enable RestClient for inter-service calls (default: true)
+- `USE_ASYNC` - Enable async API calls (default: true)
+- `SERVICE_B_URL` - Service B endpoint URL
+- `SERVICE_C_URL` - Service C endpoint URL
+- `SERVICES_REST_CLIENT_CONNECT_TIMEOUT` - Connection timeout in ms (default: 5000)
+- `SERVICES_REST_CLIENT_READ_TIMEOUT` - Read timeout in ms (default: 10000)
+- `JAVA_OPTS` - JVM options for memory and performance tuning
+
+See `.env.example` for complete list and documentation.
+
 ```
 
 ### Run with Docker Compose
@@ -127,6 +167,65 @@ docker-compose logs -f
 # Stop the service
 docker-compose down
 ```
+
+### Rebuild and Redeploy After Code Changes
+
+After making code changes (like updating timeout configuration), follow these steps to rebuild and redeploy:
+
+#### Option 1: Rebuild with Docker
+
+```bash
+# 1. Stop and remove the existing container
+docker stop message-chain-api
+docker rm message-chain-api
+
+# 2. Rebuild the Docker image
+docker build -t message-chain-api:latest .
+
+# 3. Run the new container using environment file
+docker run -d \
+  --name message-chain-api \
+  -p 8080:8080 \
+  --env-file .env \
+  message-chain-api:latest
+
+# 4. View logs to verify configuration
+docker logs -f message-chain-api
+```
+
+#### Option 2: Rebuild with Docker Compose
+
+```bash
+# 1. Stop and remove containers
+docker-compose down
+
+# 2. Rebuild the image
+docker-compose build
+
+# 3. Start with new build
+docker-compose up -d
+
+# 4. View logs
+docker-compose logs -f
+```
+
+#### Quick Rebuild (One-liner)
+
+```bash
+# Docker with environment file
+docker stop message-chain-api && docker rm message-chain-api && docker build -t message-chain-api:latest . && docker run -d --name message-chain-api -p 8080:8080 --env-file .env message-chain-api:latest
+
+# Docker Compose
+docker-compose down && docker-compose build && docker-compose up -d
+```
+
+**Note**: Configuration is managed through the `.env` file. Default values:
+- Connect Timeout: 5000ms (5 seconds)
+- Read Timeout: 10000ms (10 seconds)
+- RestClient: Enabled
+- Async Mode: Enabled
+
+Edit `.env` to customize these settings before running.
 
 ## API Documentation
 
@@ -338,6 +437,55 @@ message:
 
 - `{user}`: Replaced with the username from the request (Service A only)
 - `{previous_message}`: Replaced with the message from previous services (Service B and C)
+
+### Environment Configuration
+
+The application can be configured using environment variables, which is especially useful for Docker deployments:
+
+**Configuration Files:**
+- `.env` - Default configuration for local Docker deployment
+- `.env.example` - Template with all available options and detailed documentation
+
+**Key Environment Variables:**
+
+```bash
+# Application Settings
+APP_NAME=Microservice Chain          # Application display name
+
+# Feature Toggles
+USE_REST_CLIENT=true                 # Enable RestClient for inter-service calls
+USE_ASYNC=true                       # Enable async API calls
+
+# Service URLs
+SERVICE_B_URL=http://localhost:8080  # Service B endpoint
+SERVICE_C_URL=http://localhost:8080  # Service C endpoint
+
+# Timeout Configuration (milliseconds)
+SERVICES_REST_CLIENT_CONNECT_TIMEOUT=5000  # Connection timeout
+SERVICES_REST_CLIENT_READ_TIMEOUT=10000    # Read timeout
+
+# JVM Configuration
+JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
+```
+
+**Usage:**
+
+For Docker:
+```bash
+# Using environment file (recommended)
+docker run -d --name message-chain-api -p 8080:8080 --env-file .env message-chain-api:latest
+
+# Using individual variables
+docker run -d --name message-chain-api -p 8080:8080 -e USE_ASYNC=false message-chain-api:latest
+```
+
+For Docker Compose:
+```bash
+# Automatically uses .env file
+docker-compose up -d
+```
+
+See `.env.example` for complete configuration options.
 
 ## Error Handling
 
