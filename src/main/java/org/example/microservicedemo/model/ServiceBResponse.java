@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceBResponse {
+    private String applicationName;
     private String message;
     private List<ChainLink> chain;
 }

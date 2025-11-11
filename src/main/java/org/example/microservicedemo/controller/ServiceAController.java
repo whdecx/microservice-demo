@@ -1,5 +1,6 @@
 package org.example.microservicedemo.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +35,13 @@ public class ServiceAController {
     public ResponseEntity<MessageResponse> getMessage(
             @RequestParam(defaultValue = "guest")
             @Size(max = 50, message = "Query parameter 'user' must not exceed 50 characters")
-            String user) {
+            String user,
+            HttpServletRequest request) {
 
-        log.info("Received request for user: {}", user);
+        String ipAddress = request.getRemoteAddr();
+        log.info("Received request for user: {} from IP: {}", user, ipAddress);
 
-        MessageResponse response = messageService.processServiceA(user);
+        MessageResponse response = messageService.processServiceA(user, ipAddress);
 
         log.info("Returning complete message chain to client");
 

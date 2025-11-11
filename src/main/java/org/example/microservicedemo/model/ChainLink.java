@@ -18,4 +18,5 @@ public class ChainLink {
     private String service;
     private String contribution;
     private Instant timestamp;
+    private String ipAddress;
 }

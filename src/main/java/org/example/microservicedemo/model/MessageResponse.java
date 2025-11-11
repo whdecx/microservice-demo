@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponse {
+    private String applicationName;
     private String message;
     private List<ChainLink> chain;
     private Boolean complete;

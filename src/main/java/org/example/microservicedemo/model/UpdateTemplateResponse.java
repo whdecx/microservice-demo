@@ -15,6 +15,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateTemplateResponse {
+    private String applicationName;
     private String service;
     private String template;
     private Instant updatedAt;

@@ -15,7 +15,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceCResponse {
+    private String applicationName;
     private String message;
     private String contribution;
     private Instant timestamp;
+    private String ipAddress;
 }

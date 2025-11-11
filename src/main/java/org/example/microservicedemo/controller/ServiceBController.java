@@ -1,5 +1,6 @@
 package org.example.microservicedemo.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.microservicedemo.model.ServiceBRequest;
@@ -32,11 +33,13 @@ public class ServiceBController {
     @PostMapping("/append")
     public ResponseEntity<ServiceBResponse> appendMessage(
             @RequestBody @Validated ServiceBRequest request,
-            @RequestHeader(value = "X-Internal-Request", required = false) String internalHeader) {
+            @RequestHeader(value = "X-Internal-Request", required = false) String internalHeader,
+            HttpServletRequest httpRequest) {
 
-        log.info("Service B: Received internal request");
+        String ipAddress = httpRequest.getRemoteAddr();
+        log.info("Service B: Received internal request from IP: {}", ipAddress);
 
-        ServiceBResponse response = messageService.processServiceB(request);
+        ServiceBResponse response = messageService.processServiceB(request, ipAddress);
 
         log.info("Service B: Returning response to Service A");
 
@@ -44,12 +47,12 @@ public class ServiceBController {
     }
 
     /**
-     * PUT /api/service-b/message - Update Service B's message template
+     * PUT /internal/service-b/message - Update Service B's message template
      *
      * @param request New template
      * @return Update confirmation
      */
-    @PutMapping("/api/service-b/message")
+    @PutMapping("/message")
     public ResponseEntity<UpdateTemplateResponse> updateServiceBTemplate(
             @RequestBody @Validated UpdateTemplateRequest request) {
 

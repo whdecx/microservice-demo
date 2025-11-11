@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.microservicedemo.client.ServiceBClient;
 import org.example.microservicedemo.client.ServiceCClient;
+import org.example.microservicedemo.config.AppConfig;
 import org.example.microservicedemo.config.MessageTemplateConfig;
 import org.example.microservicedemo.model.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ public class MessageService {
     private final MessageTemplateConfig config;
     private final ServiceBClient serviceBClient;
     private final ServiceCClient serviceCClient;
+    private final AppConfig appConfig;
 
     @Value("${services.use-rest-client:true}")
     private boolean useRestClient;
@@ -34,10 +36,10 @@ public class MessageService {
     /**
      * Service A: Entry point - generates message and initiates chain
      */
-    public MessageResponse processServiceA(String user) {
+    public MessageResponse processServiceA(String user, String ipAddress) {
         long startTime = System.currentTimeMillis();
 
-        log.info("Service A: Processing request for user={}", user);
+        log.info("Service A: Processing request for user={} from IP={}", user, ipAddress);
 
         // Generate Service A's message
         String template = config.getServiceA().getCurrentTemplate();
@@ -48,6 +50,7 @@ public class MessageService {
                 .service("service-a")
                 .contribution(serviceAMessage)
                 .timestamp(serviceATimestamp)
+                .ipAddress(ipAddress)
                 .build();
 
         // Call Service B (via RestClient or in-process)
@@ -71,7 +74,7 @@ public class MessageService {
             }
         } else {
             log.info("Calling Service B via direct method call");
-            serviceBResponse = processServiceB(serviceBRequest);
+            serviceBResponse = processServiceB(serviceBRequest, "localhost");
         }
 
         // Build complete chain
@@ -84,6 +87,7 @@ public class MessageService {
         log.info("Service A: Complete message chain processed in {}ms", processingTime);
 
         return MessageResponse.builder()
+                .applicationName(appConfig.getApplicationName())
                 .message(serviceBResponse.getMessage())
                 .chain(completeChain)
                 .complete(true)
@@ -95,19 +99,23 @@ public class MessageService {
     /**
      * Service B: Appends message and calls Service C
      */
-    public ServiceBResponse processServiceB(ServiceBRequest request) {
-        log.info("Service B: Processing request with current message length={}",
-                request.getCurrentMessage().length());
+    public ServiceBResponse processServiceB(ServiceBRequest request, String ipAddress) {
+        log.info("Service B: Processing request with current message length={} from IP={}",
+                request.getCurrentMessage().length(), ipAddress);
 
         // Get Service B's template and append message
         String template = config.getServiceB().getCurrentTemplate();
         String serviceBMessage = template.replace("{previous_message}", request.getCurrentMessage());
 
+        // Extract the contribution by removing the placeholder
+        String contribution = template.replace("{previous_message}", "").trim();
+
         Instant serviceBTimestamp = Instant.now();
         ChainLink serviceBLink = ChainLink.builder()
                 .service("service-b")
-                .contribution("Welcome to our system.")
+                .contribution(contribution)
                 .timestamp(serviceBTimestamp)
+                .ipAddress(ipAddress)
                 .build();
 
         // Call Service C (via RestClient or in-process)
@@ -131,7 +139,7 @@ public class MessageService {
             }
         } else {
             log.info("Calling Service C via direct method call");
-            serviceCResponse = processServiceC(serviceCRequest);
+            serviceCResponse = processServiceC(serviceCRequest, "localhost");
         }
 
         // Build chain for Service B's response
@@ -141,11 +149,13 @@ public class MessageService {
                 .service("service-c")
                 .contribution(serviceCResponse.getContribution())
                 .timestamp(serviceCResponse.getTimestamp())
+                .ipAddress(serviceCResponse.getIpAddress())
                 .build());
 
         log.info("Service B: Processed and forwarded to Service C");
 
         return ServiceBResponse.builder()
+                .applicationName(appConfig.getApplicationName())
                 .message(serviceCResponse.getMessage())
                 .chain(chain)
                 .build();
@@ -154,23 +164,27 @@ public class MessageService {
     /**
      * Service C: Final service - appends final message and returns
      */
-    public ServiceCResponse processServiceC(ServiceCRequest request) {
-        log.info("Service C: Processing final request with current message length={}",
-                request.getCurrentMessage().length());
+    public ServiceCResponse processServiceC(ServiceCRequest request, String ipAddress) {
+        log.info("Service C: Processing final request with current message length={} from IP={}",
+                request.getCurrentMessage().length(), ipAddress);
 
         // Get Service C's template and append final message
         String template = config.getServiceC().getCurrentTemplate();
         String finalMessage = template.replace("{previous_message}", request.getCurrentMessage());
 
+        // Extract the contribution by removing the placeholder
+        String contribution = template.replace("{previous_message}", "").trim();
+
         Instant serviceCTimestamp = Instant.now();
-        String contribution = "Your account is ready!";
 
         log.info("Service C: Final message generated");
 
         return ServiceCResponse.builder()
+                .applicationName(appConfig.getApplicationName())
                 .message(finalMessage)
                 .contribution(contribution)
                 .timestamp(serviceCTimestamp)
+                .ipAddress(ipAddress)
                 .build();
     }
 
@@ -201,6 +215,7 @@ public class MessageService {
         log.info("Template updated successfully for service={}", serviceName);
 
         return UpdateTemplateResponse.builder()
+                .applicationName(appConfig.getApplicationName())
                 .service(serviceName)
                 .template(newTemplate)
                 .updatedAt(Instant.now())

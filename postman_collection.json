@@ -280,17 +280,17 @@
 							"raw": "{\n  \"template\": \"{previous_message} Everything is ready for you.\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/service-b/message",
+							"raw": "{{base_url}}/internal/service-b/message",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"api",
+								"internal",
 								"service-b",
 								"message"
 							]
 						},
-						"description": "Update the message template for Service B. Use {previous_message} placeholder to include the message from Service A."
+						"description": "Update the message template for Service B (internal endpoint). Use {previous_message} placeholder to include the message from Service A."
 					},
 					"response": []
 				},
@@ -328,17 +328,17 @@
 							"raw": "{\n  \"template\": \"{previous_message} Let's get started!\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/service-c/message",
+							"raw": "{{base_url}}/internal/service-c/message",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"api",
+								"internal",
 								"service-c",
 								"message"
 							]
 						},
-						"description": "Update the message template for Service C. Use {previous_message} placeholder to include the combined message from Services A and B."
+						"description": "Update the message template for Service C (internal endpoint). Use {previous_message} placeholder to include the combined message from Services A and B."
 					},
 					"response": []
 				}
